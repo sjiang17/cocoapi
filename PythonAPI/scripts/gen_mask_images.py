@@ -16,13 +16,14 @@ def box_area(xmin, ymin, xmax, ymax):
 
 def mask_img(box):
 	xmin, ymin, xmax, ymax = box
+	bbarea = box_area(xmin, ymin, xmax, ymax)
+	if bbarea <= 1.0:
+		return None
 	satified = False
 	while not satified:
-		# print xmin, xmax
 		mask_xmin, mask_xmax = sorted(np.random.randint(xmin, xmax+1, 2))
 		mask_ymin, mask_ymax = sorted(np.random.randint(ymin, ymax+1, 2))
-		ratio = box_area(mask_xmin, mask_ymin, mask_xmax, mask_ymax) / \
-			box_area(xmin, ymin, xmax, ymax) 
+		ratio = box_area(mask_xmin, mask_ymin, mask_xmax, mask_ymax) / bbarea
 		if ratio >= 0.3 and ratio < 0.7:
 			satified = True
 	mask = [mask_xmin, mask_ymin, mask_xmax, mask_ymax]
@@ -36,10 +37,13 @@ def grey_patch(img, annot):
 	gt_classes = annot['gt_classes']
 	# areas = annot['areas']
 	mask_areas, mask_boxes = [], []
-	for (box, occ) in zip(boxes, occluded):
+	for box in boxes:
 		if np.random.rand() < prob:
 			mask = mask_img(box)
-			cv2.rectangle(img, (mask[0], mask[1]), (mask[2], mask[3]), (104,117,123), -1)
+			if mask:
+				cv2.rectangle(img, (mask[0], mask[1]), (mask[2], mask[3]), (104,117,123), -1)
+			else:
+				mask = [0,0,0,0]
 		else:
 			mask = [0,0,0,0]
 		mask_areas.append(box_area(mask[0], mask[1], mask[2], mask[3]))
@@ -51,7 +55,8 @@ if __name__ == '__main__':
 
 	random.seed(100)
 	# kitti_dir = '/fldata/dataset/coco/training'
-	
+	img_dir = '/fldata/dataset/coco/train2017'
+	annot_dir = '/fldata/dataset/coco/flood_data/annotations/train'        
 	save_dir = '/fldata/dataset/coco/mask/train'
 	# train_dir_0 = os.path.join(save_dir, 'train/0')
 	train_dir_1 = os.path.join(save_dir, '1')
@@ -68,8 +73,8 @@ if __name__ == '__main__':
 	
 	coco = my_coco(img_dir, annot_dir)
 	# get all images and annotations
-	annot_list = kitti._list_annots()
-	img_list = kitti._list_imgs()
+	annot_list = coco._list_annots()
+	img_list = coco._list_imgs()
 	
 	# iterate every image
 	for ix, (img_file, annot_file) in enumerate(zip(img_list, annot_list)):

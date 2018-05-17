@@ -11,15 +11,18 @@ from collections import defaultdict
 cls_to_keep = [1, 2, 3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20, 21, 22, 23, 24,
                25, 52, 53, 55, 59, 61, 70, 72, 73, 76, 78, 79, 81, 82, 84, 85, 86, 88]
 
-annot_dir = '/Users/siyu/Projects/dataset/coco/flood_data/original/val'
-save_dir = '/Users/siyu/Projects/dataset/coco/flood_data/annotations/val'
-imgset_file = '/Users/siyu/Projects/dataset/coco/flood_data/annotations/val.txt'
-
+annot_dir = '/fldata/dataset/coco/original/annotations/train' 
+save_dir = '/fldata/dataset/coco/flood_data/annotations/train'
+imgset_file = '/fldata/dataset/coco/flood_data/annotations/train.txt'
+num_to_keep = 30000
 annot_files = sorted([os.path.join(annot_dir, f)
                       for f in os.listdir(annot_dir) if f.endswith('.json')])
 
 img_names = []
+num_kept = 0
 for annot_file in annot_files:
+    if num_kept == num_to_keep:
+        break
     keep = False
     annot = json.load(open(annot_file, 'r'))
     new_annot = dict()
@@ -35,6 +38,7 @@ for annot_file in annot_files:
         obj_list.append(obj)
 
     if keep:
+	num_kept += 1
     	new_annot['annotation'] = obj_list
         basename = os.path.basename(annot_file)
         save_file = os.path.join(save_dir, basename)

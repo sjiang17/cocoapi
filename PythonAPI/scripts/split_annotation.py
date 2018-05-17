@@ -19,18 +19,18 @@ if __name__ == "__main__":
 
     # args = parser.parse_args()
     # annofile = args.annofile
-    annofile = '/Users/siyu/Projects/dataset/coco/data/annotations/instances_val2017.json'
+    annofile = '/fldata/dataset/coco/annotations/instances_train2017.json'
     if not os.path.exists(annofile):
         print "{} does not exist!".format(annofile)
         sys.exit()
 
     # out_dir = args.out_dir
-    out_dir = '/Users/siyu/Projects/dataset/coco/flood_data/annotations/val'
+    out_dir = '/fldata/dataset/coco/flood_data/annotations/train'
     if out_dir:
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
     # imgset_file = args.imgset_file
-    imgset_file = '/Users/siyu/Projects/dataset/coco/flood_data/annotations/val.txt'
+    imgset_file = '/fldata/dataset/coco/flood_data/annotations/train.txt'
     if imgset_file:
         imgset_dir = os.path.dirname(imgset_file)
         if not os.path.exists(imgset_dir):
